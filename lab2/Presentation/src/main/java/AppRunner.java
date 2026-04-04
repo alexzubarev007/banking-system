@@ -1,8 +1,5 @@
 import Accounts.AccountDto;
-import Accounts.Requests.CreateAccountRequest;
-import Accounts.Requests.PutMoneyRequest;
-import Accounts.Requests.TransferRequest;
-import Accounts.Requests.WithdrawRequest;
+import Accounts.Requests.*;
 import Operations.OperationDto;
 import Operations.Requests.GetHistoryRequest;
 import Repositories.AccountRepository;
@@ -59,7 +56,8 @@ public class AppRunner {
                     6.Get user details
                     7.Add friends
                     8.Get account operation history
-                    9.Exit
+                    9.Get account details
+                    10.Exit
                     """);
             int command = scanner.nextInt();
 
@@ -72,7 +70,8 @@ public class AppRunner {
                 case 6 -> getUserDetails(scanner, userService);
                 case 7 -> addFriends(scanner, userService);
                 case 8 -> getAccountOperationHistory(scanner, operationService);
-                case 9 -> isRunning = false;
+                case 9 -> getAccountDetails(scanner, accountService);
+                case 10 -> isRunning = false;
             }
         }
     }
@@ -186,6 +185,19 @@ public class AppRunner {
         for (UUID friendId : user.friends()) {
             System.out.println(friendId);
         }
+    }
+
+    private void getAccountDetails(Scanner scanner, AccountService accountService) {
+        System.out.println("Account id: ");
+        UUID accountId = UUID.fromString(scanner.next());
+
+        GetAccountDetailsRequest request = new GetAccountDetailsRequest(accountId);
+
+        AccountDto account = accountService.getAccountDetails(request);
+
+        System.out.println("id: " + account.id());
+        System.out.println("balance: " + account.balance());
+        System.out.println("user id: " + account.userId());
     }
 
     private void addFriends(Scanner scanner, UserService userService) {

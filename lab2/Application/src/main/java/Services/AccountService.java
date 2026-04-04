@@ -44,6 +44,15 @@ public class AccountService {
         }
     }
 
+    public AccountDto getAccountDetails(GetAccountDetailsRequest request)
+            throws NotFoundException {
+        Account account = accountRepository
+                .findById(request.accountID())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        return AccountMapping.mapToDto(account);
+    }
+
     public BigDecimal getBalance(GetBalanceRequest request)
             throws NotFoundException {
         Account account = accountRepository
