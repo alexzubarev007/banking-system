@@ -10,8 +10,11 @@ import Users.Requests.GetUserDetailsRequest;
 import Users.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +23,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
     private final UserService userService;
 
@@ -27,7 +31,8 @@ public class UserController {
     @Operation(summary = "Create user operation")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "201", description = "User created")
-    public UserDto createUser(@RequestBody CreateUserRequest request) {
+    @ApiResponse(responseCode = "400", description = "Incorrect input")
+    public UserDto createUser(@Valid @RequestBody CreateUserRequest request) {
         return userService.createUser(request);
     }
 
@@ -60,7 +65,9 @@ public class UserController {
     @GetMapping("/filters")
     @Operation(summary = "Find by hair color and gender operation")
     @ApiResponse(responseCode = "200", description = "Users found")
+    @ApiResponse(responseCode = "400", description = "Incorrect name")
     public List<UserDto> findByHairColorAndGender(
+            @Size(min = 2, max = 30, message = "Hair color must be between 2 and 30 characters")
             @RequestParam(required = false) String hairColor,
             @RequestParam(required = false) Gender gender) {
         FindByHairColorAndGenderRequest request = new FindByHairColorAndGenderRequest(hairColor, gender);

@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation(project(":lab3:Domain"))
     implementation("io.swagger.core.v3:swagger-annotations:2.2.9")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
 }
 
 tasks.test {
