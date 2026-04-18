@@ -22,7 +22,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = App.class)
+@SpringBootTest(
+        classes = App.class,
+        properties = {
+                "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration"
+        }
+)
 public class AccountControllerTests {
     @Autowired
     private WebApplicationContext webApplicationContext;
