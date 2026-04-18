@@ -1,18 +1,16 @@
 import Accounts.AccountDto;
-import Runners.App;
+import Controllers.AccountController;
 import Services.AccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -22,26 +20,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(
-        classes = App.class,
-        properties = {
-                "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration"
-        }
-)
 public class AccountControllerTests {
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @Mock
     private AccountService accountService;
 
+    private AccountController accountController;
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(webApplicationContext)
-                .build();
+        MockitoAnnotations.openMocks(this);
+        accountController = new AccountController(accountService);
+        mockMvc = MockMvcBuilders.standaloneSetup(accountController).build();
     }
 
     @Test

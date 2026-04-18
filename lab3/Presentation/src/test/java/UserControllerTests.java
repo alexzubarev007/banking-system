@@ -1,20 +1,20 @@
-import Runners.App;
+import Controllers.UserController;
 import Services.UserService;
 import Users.Gender;
 import Users.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.*;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+
 
 import java.util.HashSet;
 import java.util.List;
@@ -26,27 +26,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(
-        classes = App.class,
-        properties = {
-                "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration",
-                "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration"
-        }
-)
-public class UserControllerTests {
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
+public class UserControllerTests {
+
+    @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @Mock
     private UserService userService;
+
+    private UserController userController;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(webApplicationContext)
-                .build();
+        MockitoAnnotations.openMocks(this);
+        userController = new UserController(userService);
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test

@@ -1,18 +1,16 @@
+import Controllers.OperationController;
 import Operations.OperationDto;
 import Operations.OperationType;
-import Runners.App;
 import Services.OperationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,27 +21,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(
-        classes = App.class,
-        properties = {
-                "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration",
-                "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration"
-        }
-)
 public class OperationControllerTests {
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @Mock
     private OperationService operationService;
+
+    private OperationController operationController;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(webApplicationContext)
-                .build();
+        MockitoAnnotations.openMocks(this);
+        operationController = new OperationController(operationService);
+        mockMvc = MockMvcBuilders.standaloneSetup(operationController).build();
     }
 
     @Test
