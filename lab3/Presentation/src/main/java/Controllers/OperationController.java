@@ -7,7 +7,9 @@ import Operations.Requests.GetHistoryRequest;
 import Services.OperationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/operation")
 @RequiredArgsConstructor
+@Validated
 public class OperationController {
     private final OperationService operationService;
 
@@ -23,7 +26,8 @@ public class OperationController {
     @Operation(summary = "Get history operation")
     @ApiResponse(responseCode = "200", description = "Operation history got")
     @ApiResponse(responseCode = "404", description = "Account not found")
-    public List<OperationDto> getHistory(@PathVariable UUID accountId) {
+    public List<OperationDto> getHistory(@NotNull(message = "Account id is required")
+                                         @PathVariable UUID accountId) {
         GetHistoryRequest request = new GetHistoryRequest(accountId);
         return operationService.getHistory(request);
     }

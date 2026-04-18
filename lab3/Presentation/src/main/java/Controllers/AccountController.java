@@ -5,8 +5,11 @@ import Accounts.Requests.*;
 import Services.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor
+@Validated
 public class AccountController {
     private final AccountService accountService;
 
@@ -31,7 +35,9 @@ public class AccountController {
     @Operation(summary = "Get account details operation")
     @ApiResponse(responseCode = "200", description = "Account details got")
     @ApiResponse(responseCode = "404", description = "Account not found")
-    public AccountDto getAccountDetails(@PathVariable UUID accountId) {
+    public AccountDto getAccountDetails(@NotNull(message = "Account id is required")
+                                        @PathVariable
+                                        UUID accountId) {
         GetAccountDetailsRequest request = new GetAccountDetailsRequest(accountId);
         return accountService.getAccountDetails(request);
     }
@@ -40,7 +46,7 @@ public class AccountController {
     @Operation(summary = "Put money operation")
     @ApiResponse(responseCode = "200", description = "Money put")
     @ApiResponse(responseCode = "404", description = "Account not found")
-    public AccountDto putMoney(@RequestBody PutMoneyRequest request) {
+    public AccountDto putMoney(@Valid @RequestBody PutMoneyRequest request) {
         return accountService.putMoney(request);
     }
 
@@ -49,7 +55,7 @@ public class AccountController {
     @ApiResponse(responseCode = "200", description = "Money withdrawn")
     @ApiResponse(responseCode = "404", description = "Account not found")
     @ApiResponse(responseCode = "400", description = "Not enough money")
-    public AccountDto withdraw(@RequestBody WithdrawRequest request) {
+    public AccountDto withdraw(@Valid @RequestBody WithdrawRequest request) {
         return accountService.withdraw(request);
     }
 
@@ -57,14 +63,16 @@ public class AccountController {
     @Operation(summary = "Transfer money operation")
     @ApiResponse(responseCode = "200", description = "Money transferred")
     @ApiResponse(responseCode = "404", description = "Account not found")
-    public void transfer(@RequestBody TransferRequest request) {
+    public void transfer(@Valid @RequestBody TransferRequest request) {
         accountService.transfer(request);
     }
 
     @GetMapping("users/{userId}")
     @Operation(summary = "Find accounts by user id operation")
     @ApiResponse(responseCode = "200", description = "Accounts found")
-    public List<AccountDto> findByUserId(@PathVariable UUID userId) {
+    public List<AccountDto> findByUserId(
+            @NotNull(message = "User id is required")
+            @PathVariable UUID userId) {
         FindByUserIdRequest request = new FindByUserIdRequest((userId));
         return accountService.findByUserId(request);
     }

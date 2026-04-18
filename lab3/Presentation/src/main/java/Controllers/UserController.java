@@ -11,6 +11,7 @@ import Users.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -40,7 +41,8 @@ public class UserController {
     @Operation(summary = "Get user details operation")
     @ApiResponse(responseCode = "200", description = "User details got")
     @ApiResponse(responseCode = "404", description = "User not found")
-    public UserDto getUserDetails(@PathVariable UUID userId) {
+    public UserDto getUserDetails(@NotNull(message = "User id is required")
+                                  @PathVariable UUID userId) {
         GetUserDetailsRequest request = new GetUserDetailsRequest(userId);
         return userService.getUserDetails(request);
     }
@@ -49,7 +51,7 @@ public class UserController {
     @Operation(summary = "Add friends operation")
     @ApiResponse(responseCode = "200", description = "Friends added")
     @ApiResponse(responseCode = "404", description = "User not found")
-    public void addFriend(@RequestBody AddFriendRequest request) {
+    public void addFriend(@Valid @RequestBody AddFriendRequest request) {
         userService.addFriend(request);
     }
 
@@ -57,7 +59,7 @@ public class UserController {
     @Operation(summary = "Find friends operation")
     @ApiResponse(responseCode = "200", description = "Friends found")
     @ApiResponse(responseCode = "404", description = "User not found")
-    public List<UserDto> findFriends(@PathVariable UUID id) {
+    public List<UserDto> findFriends(@Valid @PathVariable UUID id) {
         FindFriendsRequest request = new FindFriendsRequest(id);
         return userService.findFriends(request);
     }
