@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: bank-lab
+    restart: always
+    environment:
+      POSTGRES_DB: banks_lab
+      POSTGRES_USER: banks_user
+      POSTGRES_PASSWORD: banks_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
