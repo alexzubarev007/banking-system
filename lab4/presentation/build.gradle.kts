@@ -20,7 +20,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:4.1.0-M4")
     implementation("org.springframework.boot:spring-boot-starter-security:4.1.0-M4")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test:4.1.0-M4")
-    testImplementation ("org.springframework.security:spring-security-test:7.1.0-RC1")
     implementation("org.springframework.boot:spring-boot-starter-webmvc:4.1.0-M4")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
