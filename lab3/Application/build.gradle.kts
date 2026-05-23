@@ -16,7 +16,6 @@ dependencies {
     implementation(project(":lab3:Application.Contracts"))
     implementation("org.springframework:spring-context:7.0.6")
     implementation("org.springframework:spring-tx:7.0.6")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.test {

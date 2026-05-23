@@ -1,0 +1,8 @@
+services:
+  rabbit:
+    image: rabbitmq:4-management
+    container_name: rabbitmq-lab5
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"

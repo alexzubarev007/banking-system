@@ -1,0 +1,12 @@
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    queues:
+      rates: "rates"
+      requests: "rates_request"
+rates: "{USD: 71.15, EUR: 82.5, CNY: 10.44}"
+server:
+  port: 8081
