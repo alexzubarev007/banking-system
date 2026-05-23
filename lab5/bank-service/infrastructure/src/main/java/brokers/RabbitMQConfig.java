@@ -1,6 +1,8 @@
 package brokers;
 
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +14,11 @@ public class RabbitMQConfig {
 
     @Value("${spring.rabbitmq.queues.requests}")
     private String requestQueue;
+
+    @Bean
+    public MessageConverter messageConverter() {
+        return new JacksonJsonMessageConverter();
+    }
 
     @Bean
     public Queue rateQueue() {
