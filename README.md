@@ -52,11 +52,10 @@ BANK_DB_PORT=15434 BANK_RABBIT_PORT=15673 BANK_RABBIT_MANAGEMENT_PORT=15674 dock
 ./gradlew :rates-service:presentation:bootRun
 ```
 
-Во втором терминале задайте логин первого администратора и свой пароль длиной 12–30 символов, затем запустите банк:
+Во втором терминале задайте логин первого администратора и переменную `BANK_ADMIN_PASSWORD` со своим паролем длиной 12–30 символов, затем запустите банк. Значение пароля не добавляйте в Git.
 
 ```sh
 export BANK_ADMIN_LOGIN=admin
-# Задайте BANK_ADMIN_PASSWORD локально, не добавляя значение в Git.
 ./gradlew :bank-service:presentation:bootRun
 ```
 
@@ -87,10 +86,22 @@ docker compose stop
 
 ## Проверки
 
+Модульные и HTTP/security-тесты без Docker:
+
 ```sh
-./gradlew test                 # unit и HTTP/security-тесты без Docker
-./gradlew build -Pintegration  # также PostgreSQL и RabbitMQ в Testcontainers
-python3 scripts/smoke.py       # два собранных приложения и новая временная БД (нужен Python 3)
+./gradlew test
+```
+
+Полная сборка, включая проверки PostgreSQL и RabbitMQ в Testcontainers:
+
+```sh
+./gradlew build -Pintegration
+```
+
+Сквозная проверка двух собранных приложений на новой временной БД; нужен Python 3:
+
+```sh
+python3 scripts/smoke.py
 ```
 
 Интеграционные тесты создают собственные контейнеры со случайными портами и не используют локальную БД. Проверяются сохранение переводов, откат при ошибке второй записи истории, параллельные пополнения и встречные переводы, сообщения RabbitMQ и недоступность поставщика. В брокерных тестах банка поставщик ответов — тестовый компонент; реальный `rates-service` проверяется отдельно и при проверке запуска двух приложений.
