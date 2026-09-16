@@ -24,8 +24,7 @@ public class DomainUserRepository
     @Override
     public User save(User user) {
         UserJpaEntity userEntity = jpaMapper.mapToJpa(user);
-        jpaRepository.save(userEntity);
-        return UserToDomainMapping.mapToDomain(userEntity);
+        return UserToDomainMapping.mapToDomain(jpaRepository.save(userEntity));
     }
 
     @Override

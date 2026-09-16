@@ -34,7 +34,7 @@ public class UserControllerTests {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         userController = new UserController(userService);
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).setCustomArgumentResolvers(new org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver()).build();
     }
 
     @Test
@@ -61,7 +61,7 @@ public class UserControllerTests {
 
         List<UserDto> friends = List.of(testFriend1, testFriend2);
 
-        Mockito.when(userService.findFriends(any()))
+        Mockito.when(userService.findFriends(any(), any()))
                 .thenReturn(friends);
 
         mockMvc.perform(get("/api/users/friends/{id}", userId))

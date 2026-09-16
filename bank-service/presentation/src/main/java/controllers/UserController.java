@@ -68,9 +68,9 @@ public class UserController {
     @ApiResponse(responseCode = "403", description = "Forbidden")
     @ApiResponse(responseCode = "404", description = "User not found")
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
-    public List<UserDto> findFriends(@Valid @PathVariable UUID id) {
+    public List<UserDto> findFriends(@Valid @PathVariable UUID id, @AuthenticationPrincipal User user) {
         FindFriendsRequest request = new FindFriendsRequest(id);
-        return userService.findFriends(request);
+        return userService.findFriends(request, user);
     }
 
     @GetMapping("/filters")

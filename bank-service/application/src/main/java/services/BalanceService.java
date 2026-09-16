@@ -5,12 +5,8 @@ import authentifications.Authentication;
 import authentifications.Role;
 import balances.requests.GetBalanceRequest;
 import balances.requests.GetConvertedBalanceRequest;
-import brokers.*;
+import rates.*;
 import lombok.RequiredArgsConstructor;
-import messages.RatesMessage;
-import messages.RatesResponse;
-import messages.RequestMessage;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import repositories.AccountRepository;
@@ -21,16 +17,13 @@ import services.exceptions.UnauthorizedException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class BalanceService {
     private final AccountRepository accountRepository;
     private final AuthentificationRepository authentificationRepository;
-    private final RabbitMQRequestProducer producer;
-    private final Map<String, BigDecimal> ratesCache = new HashMap<>();
+    private final RateProvider rateProvider;
 
     public BigDecimal getBalance(GetBalanceRequest request,
                                  User userDetails)
@@ -65,21 +58,12 @@ public class BalanceService {
                 .findById(request.accountId())
                 .orElseThrow(() -> new NotFoundException("Account not found"));
 
-        if (!ratesCache.containsKey(code)) {
-            RatesResponse response = producer.sendAndReceiveMessage(new RequestMessage(code));
-            ratesCache.put(code, response.rate());
-        }
-
         if ((authentication.role() == Role.CLIENT)
                 && (!account.getUserId().equals(authentication.userId()))) {
             throw new OtherDataException("Try to read other data!");
         }
 
-        return account.getBalance().divide(ratesCache.get(code), 5, RoundingMode.HALF_UP);
+        return account.getBalance().divide(rateProvider.getQuote(code).rate(), 5, RoundingMode.HALF_UP);
     }
 
-    @RabbitListener(queues = "${spring.rabbitmq.queues.rates}")
-    public void consume(RatesMessage message) {
-        ratesCache.put(message.code(), message.rate());
-    }
 }

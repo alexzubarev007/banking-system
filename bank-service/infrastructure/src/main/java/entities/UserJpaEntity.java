@@ -25,8 +25,9 @@ public class UserJpaEntity {
 
     private String name;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "gender")
     private Gender gender;
 
     @Setter

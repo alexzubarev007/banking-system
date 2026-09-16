@@ -1,29 +1,24 @@
 package brokers;
-
 import lombok.RequiredArgsConstructor;
-import messages.RatesResponse;
-import messages.RequestMessage;
+import messages.*;
+import rates.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 @Component
 @RequiredArgsConstructor
 public class RabbitMQRequestProducer {
-    @Value("${spring.rabbitmq.queues.requests}")
-    private String queue;
-
+    @Value("${spring.rabbitmq.queues.requests}") private String queue;
     private final RabbitTemplate rabbitTemplate;
-
-    public RatesResponse sendAndReceiveMessage(RequestMessage message)
-            throws CurrencyProblemException {
-
-        Object response = rabbitTemplate.convertSendAndReceive(queue, message);
-
-        if (response instanceof RatesResponse ratesResponse && ratesResponse.status().equals("Ok")) {
-            return ratesResponse;
+    public CurrencyQuote request(String code) {
+        try {
+            Object reply = rabbitTemplate.convertSendAndReceive(queue, new RequestMessage(code));
+            if (reply instanceof RatesResponse r && "Ok".equals(r.status()) && code.equals(r.currencyCode())) {
+                return new CurrencyQuote(code, r.rate(), r.time());
+            }
+        } catch (org.springframework.amqp.AmqpException | IllegalArgumentException e) {
+            throw new CurrencyProblemException("Currency provider unavailable or invalid reply", e);
         }
-
-        throw new CurrencyProblemException("Can't get currency rate");
+        throw new CurrencyProblemException("Unknown currency or currency provider unavailable");
     }
 }

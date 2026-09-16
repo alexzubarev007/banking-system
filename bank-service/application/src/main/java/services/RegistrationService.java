@@ -19,8 +19,9 @@ import users.UserDto;
 public class RegistrationService {
     private final AuthentificationRepository authentificationRepository;
     private final UserRepository userRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
-    public UserDto RegisterClient(RegisterClientRequest request) {
+    public UserDto registerClient(RegisterClientRequest request) {
         User user = new User(null,
                 request.name(),
                 request.gender(),
@@ -29,13 +30,11 @@ public class RegistrationService {
 
         User addedUser = userRepository.save(user);
 
-        System.out.println("User ID THERE!!!");
-        System.out.println(addedUser.getId());
 
         Authentication client = new Authentication(
                 null,
                 request.login(),
-                request.password(),
+                passwordEncoder.encode(request.password()),
                 Role.CLIENT,
                 addedUser.getId());
 
@@ -44,11 +43,11 @@ public class RegistrationService {
         return UserMapping.mapToDto(addedUser);
     }
 
-    public void RegisterAdmin(RegisterAdminRequest request) {
+    public void registerAdmin(RegisterAdminRequest request) {
         Authentication admin = new Authentication(
                 null,
                 request.login(),
-                request.password(),
+                passwordEncoder.encode(request.password()),
                 Role.ADMIN,
                 null);
 

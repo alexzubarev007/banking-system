@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RabbitMQRatesProducer {
+public class RabbitMQRatesProducer implements services.QuotePublisher {
 
     @Value("${spring.rabbitmq.queues.rates}")
     private String queue;
 
     private final RabbitTemplate rabbitTemplate;
 
-    public void sendMessage(RatesMessage message) {
+    public void publish(RatesMessage message) {
         rabbitTemplate.convertAndSend(queue, message);
     }
 }

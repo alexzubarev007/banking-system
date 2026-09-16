@@ -18,6 +18,7 @@ public class AccountJpaEntity {
     @GeneratedValue
     private UUID id;
 
+    @Column(precision = 19, scale = 2, nullable = false)
     private BigDecimal balance;
 
     @ManyToOne

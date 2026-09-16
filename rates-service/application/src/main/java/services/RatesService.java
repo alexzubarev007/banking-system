@@ -1,54 +1,34 @@
 package services;
-
-import brokers.RabbitMQRatesProducer;
-import lombok.RequiredArgsConstructor;
-import messages.RatesMessage;
-import messages.RatesResponse;
-import messages.RequestMessage;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-
+import messages.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Random;
-
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
+import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.*;
 @Service
-@RequiredArgsConstructor
 @EnableScheduling
 public class RatesService {
-    @Value("#{${rates}}")
-    private Map<String, BigDecimal> rates;
-
-    private final RabbitMQRatesProducer producer;
-
-    @Scheduled(fixedRate = 10000)
+    private final QuotePublisher publisher;
+    private final Map<String, RatesMessage> quotes = new ConcurrentHashMap<>();
+    public RatesService(QuotePublisher publisher) {
+        this.publisher = publisher;
+        Map.of("USD", "71.15", "EUR", "82.50", "CNY", "10.44").forEach((code, rate) ->
+                quotes.put(code, new RatesMessage(code, new BigDecimal(rate), Instant.now())));
+    }
+    @Scheduled(fixedRateString = "${rates.publish-interval:10s}")
     public void changeRates() {
-        rates.forEach((code, rate) -> {
-            double randomChange = new Random().nextDouble(11) - 5;
-            BigDecimal updated = rate.add(BigDecimal.valueOf(randomChange));
-
-            BigDecimal positiveRate = updated.max(BigDecimal.valueOf(0.000001));
-
-            rates.put(code, positiveRate);
-
-            RatesMessage message = new RatesMessage(code, positiveRate, Instant.now());
-
-            producer.sendMessage(message);
+        quotes.forEach((code, old) -> {
+            RatesMessage updated = quotes.compute(code, (key, current) -> new RatesMessage(key,
+                    current.rate().add(BigDecimal.valueOf(ThreadLocalRandom.current().nextInt(-50, 51), 2))
+                            .max(new BigDecimal("0.01")), Instant.now()));
+            publisher.publish(updated);
         });
     }
-
-    @RabbitListener(queues = "${spring.rabbitmq.queues.requests}")
-    public RatesResponse getRate(RequestMessage message) {
-        BigDecimal rate = rates.get(message.code());
-
-        if (!rates.containsKey(message.code())) {
-            return new RatesResponse(message.code(), null, "No such currency");
-        }
-
-        return new RatesResponse(message.code(), rate, "Ok");
+    public RatesResponse getRate(RequestMessage request) {
+        RatesMessage quote = request.code() == null ? null : quotes.get(request.code());
+        return quote == null ? new RatesResponse(request.code(), null, "Unknown currency", null)
+                : new RatesResponse(quote.code(), quote.rate(), "Ok", quote.time());
     }
 }

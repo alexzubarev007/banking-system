@@ -1,12 +1,13 @@
 spring:
+  main:
+    web-application-type: none
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${BANK_RABBIT_HOST:localhost}
+    port: ${BANK_RABBIT_PORT:5672}
+    username: ${BANK_RABBIT_USER:guest}
+    password: ${BANK_RABBIT_PASSWORD:guest}
     queues:
-      rates: "rates"
-      requests: "rates_request"
-rates: "{USD: 71.15, EUR: 82.5, CNY: 10.44}"
-server:
-  port: 8081
+      rates: rates
+      requests: rates_request
+rates:
+  publish-interval: ${RATES_PUBLISH_INTERVAL:10s}

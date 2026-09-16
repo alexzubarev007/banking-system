@@ -21,13 +21,17 @@ public class DomainAccountRepository
     @Override
     public Account save(Account account) {
         AccountJpaEntity accountEntity = jpaMapper.mapToJpa(account);
-        jpaRepository.save(accountEntity);
-        return AccountToDomainMapping.mapToDomain(accountEntity);
+        return AccountToDomainMapping.mapToDomain(jpaRepository.save(accountEntity));
     }
 
     @Override
     public Optional<Account> findById(UUID id) {
         return jpaRepository.findById(id).map(AccountToDomainMapping::mapToDomain);
+    }
+
+    @Override
+    public Optional<Account> findByIdForUpdate(UUID id) {
+        return jpaRepository.findByIdForUpdate(id).map(AccountToDomainMapping::mapToDomain);
     }
 
     @Override

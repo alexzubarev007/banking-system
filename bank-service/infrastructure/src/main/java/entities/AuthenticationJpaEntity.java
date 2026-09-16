@@ -26,8 +26,9 @@ public class AuthenticationJpaEntity {
     @Column(nullable = false)
     private String passwordHash;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "role")
     private Role role;
 
     @OneToOne(optional = true)

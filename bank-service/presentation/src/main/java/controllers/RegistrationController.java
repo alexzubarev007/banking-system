@@ -23,37 +23,20 @@ import users.UserDto;
 @Validated
 public class RegistrationController {
     private final RegistrationService registrationService;
-    private final BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping("/client")
     @Operation(summary = "Register client operation")
     @ApiResponse(responseCode = "200", description = "Registered")
     @ApiResponse(responseCode = "403", description = "Forbidden")
     public UserDto registerClient(@Valid @RequestBody RegisterClientRequest request) {
-        String passwordHash = passwordEncoder.encode(request.password());
-        System.out.println(passwordHash);
-
-        RegisterClientRequest serviceRequest = new RegisterClientRequest(
-                request.login(),
-                passwordHash,
-                request.name(),
-                request.age(),
-                request.gender(),
-                request.hairColor());
-
-        return registrationService.RegisterClient(serviceRequest);
+        return registrationService.registerClient(request);
     }
 
     @PostMapping("/admin")
     @Operation(summary = "Register admin operation")
     @ApiResponse(responseCode = "200", description = "Registered")
     @ApiResponse(responseCode = "403", description = "Forbidden")
-    public void RegisterAdmin(@Valid @RequestBody RegisterAdminRequest request) {
-        String passwordHash = passwordEncoder.encode(request.password());
-        RegisterAdminRequest serviceRequest = new RegisterAdminRequest(
-                request.login(),
-                passwordHash);
-
-        registrationService.RegisterAdmin(serviceRequest);
+    public void registerAdmin(@Valid @RequestBody RegisterAdminRequest request) {
+        registrationService.registerAdmin(request);
     }
 }

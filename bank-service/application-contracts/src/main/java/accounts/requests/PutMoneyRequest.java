@@ -14,4 +14,5 @@ public record PutMoneyRequest(
         @Schema(description = "Money to put")
         @NotNull(message = "Money is required")
         @Positive(message = "Money must be positive")
+        @jakarta.validation.constraints.Digits(integer = 17, fraction = 2)
         BigDecimal money) { }

@@ -11,6 +11,8 @@ public interface AccountRepository {
 
     Optional<Account> findById(UUID id);
 
+    Optional<Account> findByIdForUpdate(UUID id);
+
     List<Account> findByUserId(UUID id);
 
     List<Account> findAll();

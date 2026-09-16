@@ -1,22 +1,26 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5434/banks_lab
-    username: banks_user
-    password: banks_password
+    url: ${BANK_DB_URL:jdbc:postgresql://localhost:5434/banks_lab}
+    username: ${BANK_DB_USER:banks_user}
+    password: ${BANK_DB_PASSWORD:banks_password}
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+    open-in-view: false
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${BANK_RABBIT_HOST:localhost}
+    port: ${BANK_RABBIT_PORT:5672}
+    username: ${BANK_RABBIT_USER:guest}
+    password: ${BANK_RABBIT_PASSWORD:guest}
+    template:
+      reply-timeout: ${RATES_REPLY_TIMEOUT:3s}
     queues:
-      rates: "rates"
-      requests: "rates_request"
+      rates: rates
+      requests: rates_request
+rates:
+  cache-ttl: ${RATES_CACHE_TTL:30s}
 server:
-  port: 8080
+  port: ${BANK_PORT:8080}
+bootstrap:
+  admin-login: ${BANK_ADMIN_LOGIN:}
+  admin-password: ${BANK_ADMIN_PASSWORD:}

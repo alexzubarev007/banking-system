@@ -1,6 +1,6 @@
 package handlers;
 
-import brokers.CurrencyProblemException;
+import rates.CurrencyProblemException;
 import exceptions.NotEnoughMoneyException;
 import services.exceptions.NotFoundException;
 import jakarta.validation.ConstraintViolationException;
@@ -16,6 +16,11 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleInvalidArgument(IllegalArgumentException exception) {
+        return ResponseEntity.badRequest().body(exception.getMessage());
+    }
+
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handleNotFound(NotFoundException exception) {
@@ -39,7 +44,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CurrencyProblemException.class)
     public ResponseEntity<String> handleUnauthorized(CurrencyProblemException exception) {
-        return ResponseEntity.status(400).body(exception.getMessage());
+        return ResponseEntity.status(503).body(exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

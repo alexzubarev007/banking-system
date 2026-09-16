@@ -14,5 +14,8 @@ public record TransferRequest(
         @NotNull(message = "Recipient id is required")
         UUID recipientId,
         @Schema(description = "Money to transfer")
+        @NotNull(message = "Money is required")
+        @jakarta.validation.constraints.Positive
+        @jakarta.validation.constraints.Digits(integer = 17, fraction = 2)
         BigDecimal money) {
 }

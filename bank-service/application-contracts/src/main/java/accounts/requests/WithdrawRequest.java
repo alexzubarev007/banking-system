@@ -13,4 +13,7 @@ public record WithdrawRequest(
         UUID accountId,
         @Schema(description = "Money to withdraw")
         @Positive(message = "Money must be positive")
+        @NotNull(message = "Money is required")
+        @jakarta.validation.constraints.Positive
+        @jakarta.validation.constraints.Digits(integer = 17, fraction = 2)
         BigDecimal money) { }

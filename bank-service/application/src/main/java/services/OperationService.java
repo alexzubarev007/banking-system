@@ -40,7 +40,7 @@ public class OperationService {
                 .orElseThrow(() -> new NotFoundException("Account not found"));
 
 
-        if (authentication.userId() != account.getUserId()
+        if (!account.getUserId().equals(authentication.userId())
                 && authentication.role() == Role.CLIENT) {
             throw new OtherDataException("Try to read other data!");
         }

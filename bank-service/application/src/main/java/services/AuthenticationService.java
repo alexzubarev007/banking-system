@@ -13,6 +13,7 @@ import services.exceptions.NotAuthenticatedException;
 
 import java.util.List;
 
+@org.springframework.transaction.annotation.Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService implements UserDetailsService {
@@ -24,7 +25,7 @@ public class AuthenticationService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws NotAuthenticatedException {
         Authentication authentication = repository
                 .findByLogin(username)
-                .orElseThrow(() -> new NotAuthenticatedException("No user with this login"));
+                .orElseThrow(() -> new org.springframework.security.core.userdetails.UsernameNotFoundException("No user with this login"));
 
         return new User(
                 authentication.login(),

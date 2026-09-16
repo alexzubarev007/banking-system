@@ -22,8 +22,7 @@ public class DomainOperationRepository
     @Override
     public Operation save(Operation operation) {
         OperationJpaEntity operationEntity = jpaMapper.mapToJpa(operation);
-        jpaRepository.save(operationEntity);
-        return OperationToDomainMapping.mapToDomain(operationEntity);
+        return OperationToDomainMapping.mapToDomain(jpaRepository.save(operationEntity));
     }
 
     @Override

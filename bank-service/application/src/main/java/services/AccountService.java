@@ -78,7 +78,7 @@ public class AccountService {
                 .orElseThrow(() -> new UnauthorizedException("Incorrect login"));
 
         Account account = accountRepository
-                .findById(request.accountId())
+                .findByIdForUpdate(request.accountId())
                 .orElseThrow(() -> new NotFoundException("Account not found"));
 
         if (!account.getUserId().equals(authentication.userId())) {
@@ -113,7 +113,7 @@ public class AccountService {
                 .orElseThrow(() -> new UnauthorizedException("Incorrect login"));
 
         Account account = accountRepository
-                .findById(request.accountId())
+                .findByIdForUpdate(request.accountId())
                 .orElseThrow(() -> new NotFoundException("Account not found"));
 
         if (!account.getUserId().equals(authentication.userId())) {
@@ -147,17 +147,22 @@ public class AccountService {
                 .findByLogin(userDetails.getUsername())
                 .orElseThrow(() -> new UnauthorizedException("Incorrect login"));
 
-        Account senderAccount = accountRepository
-                .findById(request.senderId())
-                .orElseThrow(() -> new NotFoundException("Sender account not found"));
-
+        Account.validateAmount(request.money());
+        if (request.senderId().equals(request.recipientId())) {
+            throw new IllegalArgumentException("Sender and recipient accounts must differ");
+        }
+        java.util.UUID firstId = request.senderId().compareTo(request.recipientId()) < 0
+                ? request.senderId() : request.recipientId();
+        java.util.UUID secondId = firstId.equals(request.senderId()) ? request.recipientId() : request.senderId();
+        Account first = accountRepository.findByIdForUpdate(firstId)
+                .orElseThrow(() -> new NotFoundException("Account not found"));
+        Account second = accountRepository.findByIdForUpdate(secondId)
+                .orElseThrow(() -> new NotFoundException("Account not found"));
+        Account senderAccount = firstId.equals(request.senderId()) ? first : second;
+        Account recipientAccount = firstId.equals(request.recipientId()) ? first : second;
         if (!senderAccount.getUserId().equals(authentication.userId())) {
             throw new OtherDataException("Try to read other data!");
         }
-
-        Account recipientAccount = accountRepository
-                .findById(request.recipientId())
-                .orElseThrow(() -> new NotFoundException("Recipient account not found"));
 
         User sender = userRepository
                 .findById(senderAccount.getUserId())
@@ -165,7 +170,7 @@ public class AccountService {
 
         BigDecimal moneyToWithdraw;
 
-        if (senderAccount.getUserId() == recipientAccount.getUserId()) {
+        if (senderAccount.getUserId().equals(recipientAccount.getUserId())) {
             moneyToWithdraw = request.money();
         } else if (sender.getFriends().contains(recipientAccount.getUserId())) {
             moneyToWithdraw = request.money().multiply(BigDecimal.valueOf(1.03));
@@ -173,6 +178,7 @@ public class AccountService {
             moneyToWithdraw = request.money().multiply(BigDecimal.valueOf(1.1));
         }
 
+        moneyToWithdraw = moneyToWithdraw.setScale(2, java.math.RoundingMode.HALF_UP);
         senderAccount.withdraw(moneyToWithdraw);
         recipientAccount.putMoney(request.money());
 

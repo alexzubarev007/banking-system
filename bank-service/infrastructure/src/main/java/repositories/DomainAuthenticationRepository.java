@@ -20,8 +20,7 @@ public class DomainAuthenticationRepository implements AuthentificationRepositor
     @Override
     public Authentication save(Authentication authentication) {
         AuthenticationJpaEntity authentificationEntity = mapper.mapToJpa(authentication);
-        jpaRepository.save(authentificationEntity);
-        return AuthenticationToDomainMapping.mapToDomain(authentificationEntity);
+        return AuthenticationToDomainMapping.mapToDomain(jpaRepository.save(authentificationEntity));
     }
 
     @Override

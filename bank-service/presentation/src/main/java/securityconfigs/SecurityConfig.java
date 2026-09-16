@@ -26,6 +26,9 @@ public class SecurityConfig {
                         .hasAnyRole(Role.ADMIN.name(), Role.CLIENT.name())
                         .anyRequest()
                         .authenticated())
+                .exceptionHandling(errors -> errors.defaultAuthenticationEntryPointFor(
+                        new org.springframework.security.web.authentication.HttpStatusEntryPoint(org.springframework.http.HttpStatus.UNAUTHORIZED),
+                        request -> request.getRequestURI().startsWith(request.getContextPath() + "/api/")))
                 .formLogin(FormLoginConfigurer::permitAll)
                 .logout(LogoutConfigurer::permitAll)
                 .build();

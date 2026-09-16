@@ -22,10 +22,12 @@ public class OperationJpaEntity {
     @GeneratedValue
     private UUID id;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "operationtype")
     private OperationType type;
 
+    @Column(precision = 19, scale = 2, nullable = false)
     private BigDecimal money;
     private LocalDateTime time;
 

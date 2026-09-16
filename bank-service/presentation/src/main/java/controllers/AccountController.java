@@ -88,7 +88,7 @@ public class AccountController {
     @Operation(summary = "Find accounts by user id operation")
     @ApiResponse(responseCode = "200", description = "Accounts found")
     @ApiResponse(responseCode = "403", description = "Forbidden")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
     public List<AccountDto> findByUserId(
             @NotNull(message = "User id is required")
             @PathVariable UUID userId,
