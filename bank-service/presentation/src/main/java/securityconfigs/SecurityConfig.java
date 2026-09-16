@@ -19,16 +19,24 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-        return http
-                .csrf(CsrfConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**")
-                        .hasAnyRole(Role.ADMIN.name(), Role.CLIENT.name())
-                        .anyRequest()
-                        .authenticated())
-                .exceptionHandling(errors -> errors.defaultAuthenticationEntryPointFor(
-                        new org.springframework.security.web.authentication.HttpStatusEntryPoint(org.springframework.http.HttpStatus.UNAUTHORIZED),
-                        request -> request.getRequestURI().startsWith(request.getContextPath() + "/api/")))
+        return http.csrf(CsrfConfigurer::disable)
+                .authorizeHttpRequests(
+                        auth ->
+                                auth.requestMatchers("/api/**")
+                                        .hasAnyRole(Role.ADMIN.name(), Role.CLIENT.name())
+                                        .anyRequest()
+                                        .authenticated())
+                .exceptionHandling(
+                        errors ->
+                                errors.defaultAuthenticationEntryPointFor(
+                                        new org.springframework.security.web.authentication
+                                                .HttpStatusEntryPoint(
+                                                org.springframework.http.HttpStatus.UNAUTHORIZED),
+                                        request ->
+                                                request.getRequestURI()
+                                                        .startsWith(
+                                                                request.getContextPath()
+                                                                        + "/api/")))
                 .formLogin(FormLoginConfigurer::permitAll)
                 .logout(LogoutConfigurer::permitAll)
                 .build();

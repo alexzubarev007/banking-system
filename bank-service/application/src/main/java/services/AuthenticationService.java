@@ -19,13 +19,17 @@ import java.util.List;
 public class AuthenticationService implements UserDetailsService {
     private final AuthentificationRepository repository;
 
-
     @Override
     @NullMarked
     public UserDetails loadUserByUsername(String username) throws NotAuthenticatedException {
-        Authentication authentication = repository
-                .findByLogin(username)
-                .orElseThrow(() -> new org.springframework.security.core.userdetails.UsernameNotFoundException("No user with this login"));
+        Authentication authentication =
+                repository
+                        .findByLogin(username)
+                        .orElseThrow(
+                                () ->
+                                        new org.springframework.security.core.userdetails
+                                                .UsernameNotFoundException(
+                                                "No user with this login"));
 
         return new User(
                 authentication.login(),

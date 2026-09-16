@@ -65,10 +65,12 @@ class BankIntegrationTest {
         first = UUID.randomUUID();
         second = UUID.randomUUID();
         sql.update(
-                "INSERT INTO users(id,name,gender,age,haircolor) VALUES (?, 'Alice','FEMALE',22,'black')",
+                "INSERT INTO users(id,name,gender,age,haircolor) VALUES (?,"
+                    + " 'Alice','FEMALE',22,'black')",
                 owner);
         sql.update(
-                "INSERT INTO authentifications(id,login,password_hash,role,user_id) VALUES (?, 'alice', ?, 'CLIENT', ?)",
+                "INSERT INTO authentifications(id,login,password_hash,role,user_id) VALUES (?,"
+                    + " 'alice', ?, 'CLIENT', ?)",
                 UUID.randomUUID(),
                 encoder.encode("test-password"),
                 owner);
@@ -98,9 +100,12 @@ class BankIntegrationTest {
     @Test
     void secondHistoryWriteFailureRollsBackEntireTransfer() {
         sql.execute(
-                "CREATE OR REPLACE FUNCTION reject_test_operation() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.type='PUT' AND NEW.money=7 THEN RAISE EXCEPTION 'test failure'; END IF; RETURN NEW; END $$");
+                "CREATE OR REPLACE FUNCTION reject_test_operation() RETURNS trigger LANGUAGE"
+                    + " plpgsql AS $$ BEGIN IF NEW.type='PUT' AND NEW.money=7 THEN RAISE EXCEPTION"
+                    + " 'test failure'; END IF; RETURN NEW; END $$");
         sql.execute(
-                "CREATE TRIGGER reject_test_operation BEFORE INSERT ON operations FOR EACH ROW EXECUTE FUNCTION reject_test_operation()");
+                "CREATE TRIGGER reject_test_operation BEFORE INSERT ON operations FOR EACH ROW"
+                    + " EXECUTE FUNCTION reject_test_operation()");
         try {
             assertThrows(
                     RuntimeException.class,

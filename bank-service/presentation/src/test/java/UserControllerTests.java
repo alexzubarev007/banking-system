@@ -10,7 +10,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -20,13 +19,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 public class UserControllerTests {
 
     private MockMvc mockMvc;
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
     private UserController userController;
 
@@ -34,35 +31,39 @@ public class UserControllerTests {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         userController = new UserController(userService);
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).setCustomArgumentResolvers(new org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver()).build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(userController)
+                        .setCustomArgumentResolvers(
+                                new org.springframework.security.web.method.annotation
+                                        .AuthenticationPrincipalArgumentResolver())
+                        .build();
     }
 
     @Test
     public void testFindFriends() throws Exception {
         UUID userId = UUID.randomUUID();
 
-        UserDto testFriend1 = new UserDto(
-                UUID.randomUUID(),
-                "test friend1",
-                20,
-                Gender.MALE,
-                "test color",
-                new HashSet<>()
-        );
+        UserDto testFriend1 =
+                new UserDto(
+                        UUID.randomUUID(),
+                        "test friend1",
+                        20,
+                        Gender.MALE,
+                        "test color",
+                        new HashSet<>());
 
-        UserDto testFriend2 = new UserDto(
-                UUID.randomUUID(),
-                "test friend2",
-                22,
-                Gender.FEMALE,
-                "test color",
-                new HashSet<>()
-        );
+        UserDto testFriend2 =
+                new UserDto(
+                        UUID.randomUUID(),
+                        "test friend2",
+                        22,
+                        Gender.FEMALE,
+                        "test color",
+                        new HashSet<>());
 
         List<UserDto> friends = List.of(testFriend1, testFriend2);
 
-        Mockito.when(userService.findFriends(any(), any()))
-                .thenReturn(friends);
+        Mockito.when(userService.findFriends(any(), any())).thenReturn(friends);
 
         mockMvc.perform(get("/api/users/friends/{id}", userId))
                 .andExpect(status().isOk())
@@ -73,23 +74,23 @@ public class UserControllerTests {
     @Test
     public void testFindByHairColorAndGender() throws Exception {
 
-        UserDto testUser = new UserDto(
-                UUID.randomUUID(),
-                "test name",
-                23,
-                Gender.MALE,
-                "test color",
-                new HashSet<>()
-        );
+        UserDto testUser =
+                new UserDto(
+                        UUID.randomUUID(),
+                        "test name",
+                        23,
+                        Gender.MALE,
+                        "test color",
+                        new HashSet<>());
 
         List<UserDto> users = List.of(testUser);
 
-        Mockito.when(userService.findByHairColorAndGender(any()))
-                .thenReturn(users);
+        Mockito.when(userService.findByHairColorAndGender(any())).thenReturn(users);
 
-        mockMvc.perform(get("/api/users/filters")
-                        .param("hairColor", "test color")
-                        .param("gender", "MALE"))
+        mockMvc.perform(
+                        get("/api/users/filters")
+                                .param("hairColor", "test color")
+                                .param("gender", "MALE"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("test name"))
                 .andExpect(jsonPath("$[0].hairColor").value("test color"))

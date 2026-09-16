@@ -3,14 +3,14 @@ services:
     image: postgres:15
     environment:
       POSTGRES_DB: banks_lab
-      POSTGRES_USER: banks_user
-      POSTGRES_PASSWORD: banks_password
+      POSTGRES_USER: ${BANK_DB_USER:-banks_user}
+      POSTGRES_PASSWORD: ${BANK_DB_PASSWORD:-banks_password}
     ports: ["127.0.0.1:${BANK_DB_PORT:-5434}:5432"]
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U banks_user -d banks_lab"]
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
       interval: 3s
       timeout: 3s
       retries: 20

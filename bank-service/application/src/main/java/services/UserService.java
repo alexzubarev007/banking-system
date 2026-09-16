@@ -27,56 +27,59 @@ public class UserService {
 
     @Transactional
     public UserDto createUser(CreateUserRequest request) {
-        User user = new User(null,
-                request.name(),
-                request.gender(),
-                request.age(),
-                request.hairColor());
+        User user =
+                new User(
+                        null, request.name(), request.gender(), request.age(), request.hairColor());
 
         User addedUser = userRepository.save(user);
 
         return UserMapping.mapToDto(addedUser);
     }
 
-    public UserDto getUserDetails(GetUserDetailsRequest request,
-                                  org.springframework.security.core.userdetails.User userDetails)
-            throws NotFoundException,
-            UnauthorizedException {
-        Authentication authentication = authentificationRepository
-                .findByLogin(userDetails.getUsername())
-                .orElseThrow(() -> new UnauthorizedException("Incorrect login"));
+    public UserDto getUserDetails(
+            GetUserDetailsRequest request,
+            org.springframework.security.core.userdetails.User userDetails)
+            throws NotFoundException, UnauthorizedException {
+        Authentication authentication =
+                authentificationRepository
+                        .findByLogin(userDetails.getUsername())
+                        .orElseThrow(() -> new UnauthorizedException("Incorrect login"));
 
         if ((authentication.role() == Role.CLIENT)
                 && !(request.userId().equals(authentication.userId()))) {
             throw new OtherDataException("Try to read other data!");
         }
 
-        User user = userRepository
-                .findById(request.userId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        User user =
+                userRepository
+                        .findById(request.userId())
+                        .orElseThrow(() -> new NotFoundException("User not found"));
 
         return UserMapping.mapToDto(user);
     }
 
-
     @Transactional
-    public void addFriend(AddFriendRequest request,
-                          org.springframework.security.core.userdetails.User userDetails)
-            throws NotFoundException,
-            UnauthorizedException {
-        Authentication authentication = authentificationRepository
-                .findByLogin(userDetails.getUsername())
-                .orElseThrow(() -> new UnauthorizedException("Incorrect login"));
+    public void addFriend(
+            AddFriendRequest request,
+            org.springframework.security.core.userdetails.User userDetails)
+            throws NotFoundException, UnauthorizedException {
+        Authentication authentication =
+                authentificationRepository
+                        .findByLogin(userDetails.getUsername())
+                        .orElseThrow(() -> new UnauthorizedException("Incorrect login"));
 
-        User user1 = userRepository
-                .findById(authentication.userId())
-                .orElseThrow(() -> new NotFoundException("User1 not found"));
+        User user1 =
+                userRepository
+                        .findById(authentication.userId())
+                        .orElseThrow(() -> new NotFoundException("User1 not found"));
 
-        User user2 = userRepository
-                .findById(request.user2())
-                .orElseThrow(() -> new NotFoundException("User2 not found"));
+        User user2 =
+                userRepository
+                        .findById(request.user2())
+                        .orElseThrow(() -> new NotFoundException("User2 not found"));
 
-        if (user1.getId().equals(user2.getId())) throw new IllegalArgumentException("Cannot add yourself as a friend");
+        if (user1.getId().equals(user2.getId()))
+            throw new IllegalArgumentException("Cannot add yourself as a friend");
         user1.getFriends().add(user2.getId());
         user2.getFriends().add(user1.getId());
 
@@ -85,21 +88,24 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteFriend(DeleteFriendRequest request,
-                             org.springframework.security.core.userdetails.User userDetails)
-            throws NotFoundException,
-            UnauthorizedException {
-        Authentication authentication = authentificationRepository
-                .findByLogin(userDetails.getUsername())
-                .orElseThrow(() -> new UnauthorizedException("Incorrect login"));
+    public void deleteFriend(
+            DeleteFriendRequest request,
+            org.springframework.security.core.userdetails.User userDetails)
+            throws NotFoundException, UnauthorizedException {
+        Authentication authentication =
+                authentificationRepository
+                        .findByLogin(userDetails.getUsername())
+                        .orElseThrow(() -> new UnauthorizedException("Incorrect login"));
 
-        User user = userRepository
-                .findById(authentication.userId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        User user =
+                userRepository
+                        .findById(authentication.userId())
+                        .orElseThrow(() -> new NotFoundException("User not found"));
 
-        User friend = userRepository
-                .findById(request.friendId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        User friend =
+                userRepository
+                        .findById(request.friendId())
+                        .orElseThrow(() -> new NotFoundException("User not found"));
 
         user.getFriends().remove(request.friendId());
         friend.getFriends().remove(user.getId());
@@ -108,11 +114,15 @@ public class UserService {
         userRepository.save(friend);
     }
 
-    public List<UserDto> findFriends(FindFriendsRequest request, org.springframework.security.core.userdetails.User principal)
+    public List<UserDto> findFriends(
+            FindFriendsRequest request,
+            org.springframework.security.core.userdetails.User principal)
             throws NotFoundException {
 
-        Authentication authentication = authentificationRepository.findByLogin(principal.getUsername())
-                .orElseThrow(() -> new UnauthorizedException("Incorrect login"));
+        Authentication authentication =
+                authentificationRepository
+                        .findByLogin(principal.getUsername())
+                        .orElseThrow(() -> new UnauthorizedException("Incorrect login"));
         if (authentication.role() == Role.CLIENT && !request.id().equals(authentication.userId())) {
             throw new OtherDataException("Try to read other data!");
         }
@@ -120,18 +130,14 @@ public class UserService {
             throw new NotFoundException("User not found");
         }
 
-
-        return userRepository
-                .findFriendsById(request.id())
-                .stream()
+        return userRepository.findFriendsById(request.id()).stream()
                 .map(UserMapping::mapToDto)
                 .toList();
     }
 
     public List<UserDto> findByHairColorAndGender(FindByHairColorAndGenderRequest request) {
-        return userRepository.findByHairColorAndGender(
-                        request.hairColor(),
-                        request.gender())
+        return userRepository
+                .findByHairColorAndGender(request.hairColor(), request.gender())
                 .stream()
                 .map(UserMapping::mapToDto)
                 .toList();
