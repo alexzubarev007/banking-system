@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: banks_lab
+      POSTGRES_USER: banks_user
+      POSTGRES_PASSWORD: banks_password
+    ports: ["127.0.0.1:${BANK_DB_PORT:-5434}:5432"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U banks_user -d banks_lab"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  rabbit:
+    image: rabbitmq:4-management
+    ports:
+      - "127.0.0.1:${BANK_RABBIT_PORT:-5672}:5672"
+      - "127.0.0.1:${BANK_RABBIT_MANAGEMENT_PORT:-15672}:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+volumes:
+  postgres_data:
