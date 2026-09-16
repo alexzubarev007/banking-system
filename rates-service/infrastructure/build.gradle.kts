@@ -1,20 +1,6 @@
-plugins {
-    id("java")
-    id("io.freefair.lombok") version "9.2.0"
-}
-
-group = "ru.Zubarev"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    implementation(project(":lab5:shared"))
-    implementation("org.springframework.boot:spring-boot-starter-amqp:4.1.0-M4")
-}
-
-tasks.test {
-    useJUnitPlatform()
+    implementation("tools.jackson.core:jackson-databind")
+    implementation(project(":rates-service:application"))
+    implementation(project(":shared"))
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
 }
